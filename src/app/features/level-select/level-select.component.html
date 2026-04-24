@@ -1,0 +1,105 @@
+<div class="level-select">
+
+  <!-- ── Header ───────────────────────────────────────────────────────────── -->
+  <header class="hero">
+    <div class="hero__badge" aria-hidden="true">🎹</div>
+    <h1 class="hero__title">Piano Melody Memory</h1>
+    <p class="hero__subtitle">
+      A <em>Simon-style</em> memory game for piano learners. Listen to a melody,
+      repeat it on the keyboard, then watch it grow one note longer.
+      How far can your ear remember?
+    </p>
+
+    @if (allTimeBest(); as best) {
+      <div class="all-time" @fadeIn>
+        <span class="all-time__label">All-time best</span>
+        <span class="all-time__value">{{ best.length }} notes</span>
+        <span class="all-time__level">on {{ levelNameOf(best.level) }}</span>
+      </div>
+    }
+
+    @if (lastPlayed(); as last) {
+      <div class="resume" @fadeIn>
+        <span class="resume__label">Pick up where you left off:</span>
+        <a class="resume__link" [routerLink]="['/play', last]">
+          Continue {{ levelNameOf(last) }} →
+        </a>
+      </div>
+    }
+  </header>
+
+  <!-- ── Level grid ───────────────────────────────────────────────────────── -->
+  <section class="levels" [@cardsEnter]>
+
+    @for (level of levels; track level.id) {
+      <article
+        class="level-card"
+        [class]="'level-card level-card--' + level.accent"
+        [class.level-card--last-played]="lastPlayed() === level.id"
+      >
+        <!-- Level header -->
+        <div class="level-card__header">
+          <span class="level-card__kicker">{{ level.rangeLabel }}</span>
+          <h2 class="level-card__name">{{ level.name }}</h2>
+          <p class="level-card__tagline">{{ level.tagline }}</p>
+        </div>
+
+        <!-- Description -->
+        <p class="level-card__desc">{{ level.description }}</p>
+
+        <!-- Pool size badge -->
+        <div class="level-card__pool" aria-label="Notes in pool">
+          <span class="pool-badge">{{ poolSizeFor(level) }} notes in pool</span>
+        </div>
+
+        <!-- Stats -->
+        @if (hasStats(level)) {
+          <div class="level-card__stats">
+            <div class="stat">
+              <span class="stat__value">{{ statsFor(level).bestLength }}</span>
+              <span class="stat__label">Best length</span>
+            </div>
+            <div class="stat">
+              <span class="stat__value">{{ statsFor(level).totalRounds }}</span>
+              <span class="stat__label">Rounds</span>
+            </div>
+            <div class="stat">
+              <span class="stat__value">{{ statsFor(level).totalSequencesCompleted }}</span>
+              <span class="stat__label">Sequences</span>
+            </div>
+          </div>
+          <div class="level-card__last-played">
+            Last played {{ lastPlayedAgo(level) }}
+          </div>
+        } @else {
+          <div class="level-card__stats level-card__stats--empty">
+            <span>No rounds yet — your first play starts the record.</span>
+          </div>
+        }
+
+        <!-- Play button -->
+        <a class="btn btn--primary level-card__play" [routerLink]="['/play', level.id]">
+          <svg class="btn__icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          {{ hasStats(level) ? 'Play again' : 'Play' }}
+        </a>
+      </article>
+    }
+
+  </section>
+
+  <!-- ── Footer ────────────────────────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="footer__hint">
+      Pick any level anytime — nothing is locked. Your progress is saved
+      locally in your browser.
+    </div>
+    @if (hasAnyStats()) {
+      <button class="btn btn--ghost btn--danger" (click)="resetAllConfirm()">
+        Reset all progress
+      </button>
+    }
+  </footer>
+
+</div>

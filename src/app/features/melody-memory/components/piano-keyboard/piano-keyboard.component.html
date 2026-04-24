@@ -1,0 +1,40 @@
+<div
+  class="keyboard"
+  [class.keyboard--disabled]="disabled"
+  role="group"
+  aria-label="Piano keyboard"
+>
+  <!-- White keys (flex row) -->
+  <div class="keyboard__whites">
+    @for (key of whiteKeys(); track key.displayName) {
+      <button
+        type="button"
+        class="key key--white"
+        [class]="'key key--white ' + stateClass(key)"
+        [attr.aria-label]="key.displayName"
+        [attr.data-note]="key.displayName"
+        [disabled]="disabled"
+        (click)="onKeyPress(key)"
+      >
+        <span class="key__label">{{ key.name }}<small>{{ key.octave }}</small></span>
+      </button>
+    }
+  </div>
+
+  <!-- Black keys (absolute overlay) -->
+  <div class="keyboard__blacks" aria-hidden="true">
+    @for (b of blackKeys(); track b.note.displayName) {
+      <button
+        type="button"
+        class="key key--black"
+        [class]="'key key--black ' + stateClass(b.note)"
+        [attr.aria-label]="b.note.displayName"
+        [attr.data-note]="b.note.displayName"
+        [disabled]="disabled"
+        [style.left.%]="b.leftPct"
+        [style.width.%]="b.widthPct"
+        (click)="onKeyPress(b.note)"
+      ></button>
+    }
+  </div>
+</div>

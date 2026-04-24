@@ -1,0 +1,185 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.keyboard {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  user-select: none;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg), inset 0 -4px 0 rgba(0, 0, 0, 0.6);
+  background: #000;
+
+  &--disabled {
+    cursor: not-allowed;
+  }
+
+  &__whites,
+  &__blacks {
+    position: absolute;
+    inset: 0;
+  }
+
+  &__blacks {
+    pointer-events: none; /* only the black-key buttons themselves receive events */
+    /* Black keys visually sit "above" white keys and occupy the top ~60% */
+    height: 62%;
+  }
+
+  &__whites {
+    display: flex;
+    gap: 1px;
+  }
+}
+
+/* ── Keys ─────────────────────────────────────────────────────────────── */
+
+.key {
+  position: relative;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -4px;
+    z-index: 10;
+  }
+}
+
+.key--white {
+  flex: 1 1 0;
+  background: linear-gradient(180deg, #fafafe 0%, #d6d6e2 100%);
+  color: #404058;
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+  border-bottom: 3px solid #8b8ba0;
+  border-radius: 0 0 6px 6px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: var(--spacing-sm);
+
+  &:last-child { border-right: 0; }
+
+  &:not(:disabled):hover {
+    background: linear-gradient(180deg, #ffffff 0%, #e4e4f0 100%);
+  }
+
+  &:not(:disabled):active {
+    transform: translateY(1px);
+    border-bottom-width: 2px;
+    background: linear-gradient(180deg, #ececf5 0%, #c8c8d8 100%);
+  }
+
+  .key__label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    opacity: 0.65;
+
+    small {
+      font-size: 9px;
+      margin-left: 1px;
+      opacity: 0.7;
+    }
+  }
+}
+
+.key--black {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: linear-gradient(180deg, #1c1c28 0%, #0b0b15 100%);
+  border: 1px solid #000;
+  border-bottom: 3px solid #000;
+  border-radius: 0 0 5px 5px;
+  pointer-events: auto; /* override the container's pointer-events: none */
+  z-index: 2;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.06), 0 2px 4px rgba(0,0,0,0.6);
+
+  &:not(:disabled):hover {
+    background: linear-gradient(180deg, #28283a 0%, #12121c 100%);
+  }
+
+  &:not(:disabled):active {
+    transform: translateY(1px);
+    border-bottom-width: 2px;
+    background: linear-gradient(180deg, #0f0f18 0%, #050509 100%);
+  }
+}
+
+/* ── Key state highlights ─────────────────────────────────────────────── */
+
+/* Active — app playback OR correct user press */
+.key--white.key--active {
+  background: linear-gradient(180deg, #d4d5ff 0%, #9ea1ff 100%);
+  box-shadow: 0 0 18px var(--color-accent-glow), inset 0 0 0 2px var(--color-accent);
+  color: #2b2d6b;
+  animation: keyPulse 260ms ease-out;
+}
+
+.key--black.key--active {
+  background: linear-gradient(180deg, #6366f1 0%, #3f42b8 100%);
+  box-shadow: 0 0 18px var(--color-accent-glow), inset 0 0 0 2px #8b8eff;
+  animation: keyPulse 260ms ease-out;
+}
+
+/* Error — user pressed the wrong key */
+.key--white.key--error {
+  background: linear-gradient(180deg, #fecaca 0%, #f87171 100%);
+  box-shadow: 0 0 18px var(--color-error-glow), inset 0 0 0 2px var(--color-error);
+  color: #7a1a1a;
+  animation: keyShake 380ms ease-out;
+}
+
+.key--black.key--error {
+  background: linear-gradient(180deg, #ef4444 0%, #9b1c1c 100%);
+  box-shadow: 0 0 18px var(--color-error-glow), inset 0 0 0 2px #ff8888;
+  animation: keyShake 380ms ease-out;
+}
+
+/* Hint — "here's the correct note you should have played" */
+.key--white.key--hint {
+  background: linear-gradient(180deg, #fed7aa 0%, #fbbf24 100%);
+  box-shadow: 0 0 18px var(--color-warning-glow), inset 0 0 0 2px var(--color-warning);
+  color: #7a4a0c;
+  animation: keyPulse 420ms ease-out;
+}
+
+.key--black.key--hint {
+  background: linear-gradient(180deg, #f59e0b 0%, #b45309 100%);
+  box-shadow: 0 0 18px var(--color-warning-glow), inset 0 0 0 2px #fbbf24;
+  animation: keyPulse 420ms ease-out;
+}
+
+@keyframes keyPulse {
+  0%   { transform: translateY(0) scale(1); }
+  30%  { transform: translateY(2px) scale(0.985); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes keyShake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-3px); }
+  40%      { transform: translateX(3px); }
+  60%      { transform: translateX(-2px); }
+  80%      { transform: translateX(2px); }
+}
+
+/* Responsive — shrink keyboard height on narrower screens */
+@media (max-width: 640px) {
+  .keyboard { height: 160px; }
+
+  .key--white .key__label {
+    font-size: 9.5px;
+    small { font-size: 8px; }
+  }
+}
