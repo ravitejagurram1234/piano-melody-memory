@@ -303,21 +303,16 @@ export class MelodyMemoryComponent implements OnInit, OnDestroy {
 
     await sleep(250); // small pre-roll so the phase change settles
 
+    // Keys deliberately do NOT light up during playback — the user has to
+    // identify the notes by ear. Their own correct presses still flash, and
+    // wrong presses still flash red/amber, but the listening phase is silent
+    // visually.
     const notes = this.sequence();
     for (let i = 0; i < notes.length; i++) {
       if (this.playbackGen !== gen) return;
 
       const note = notes[i];
-      this.activeKey.set(note.displayName);
       this.audio.playKey(note, NOTE_RING_MS / 1000);
-
-      // After a short flash, dim the key so the next note's flash reads distinctly.
-      const flashOffTimer = setTimeout(() => {
-        if (this.playbackGen === gen && this.activeKey() === note.displayName) {
-          this.activeKey.set(null);
-        }
-      }, Math.min(GAP_MS - 80, 440));
-      this.pendingTimeouts.push(flashOffTimer);
 
       await sleep(GAP_MS);
     }
